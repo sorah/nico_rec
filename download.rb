@@ -39,22 +39,9 @@ nico.channel_videos(ch).each do |video|
   puts "=> Downloading #{video.id}: #{video.title}"
   file = File.join(dir, "#{id}_#{video.title}.#{video.type}")
 
-  cookie_jar = Tempfile.new("niconico_cookie_jar_#{video.id}")
+  cookie_jar = video.video_cookie_jar_file
   begin
-    File.chmod(0600, cookie_jar)
-
-    cred = video.get_video_by_other
-    video_url, cookies = cred[:url], cred[:cookie]
-
-    cookie_jar.puts(cookies.map { |cookie|
-        [cookie.domain, "TRUE", cookie.path,
-         cookie.secure.inspect.upcase, cookie.expires.to_i,
-         cookie.name, cookie.value].join("\t")
-      }.join("\n"))
-
-    cookie_jar.flush
-
-    result = system("curl", "-#", "-o", file, "-b", cookie_jar.path, video_url)
+    result = system("curl", "-#", "-o", file, "-b", cookie_jar.path, video.video_url)
   ensure
     cookie_jar.close
     cookie_jar.unlink
@@ -65,3 +52,4 @@ nico.channel_videos(ch).each do |video|
     puts " ! may be failed :("
   end
 end
+
