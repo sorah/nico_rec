@@ -40,7 +40,7 @@ nico.channel_videos(ch).each do |video|
     next
   end
 
-  unless video.economy?
+  if video.economy?
     puts " * Skipping due to economy"
   end
 
