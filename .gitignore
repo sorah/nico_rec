@@ -2,3 +2,4 @@ vendor/
 videos/
 config.yml
 .bundle
+user_session.secret

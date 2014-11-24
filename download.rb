@@ -5,6 +5,8 @@ require 'yaml'
 require 'niconico'
 require 'tempfile'
 
+SESSION_FILE = "user_session.secret"
+
 # requires ./config.yml
 # requires ./videos
 
@@ -16,7 +18,13 @@ dir = File.join("videos", ch)
 Dir.mkdir(dir) unless File.exists?(dir)
 
 config = YAML.load_file('config.yml')
-nico = Niconico.new(config["email"], config["password"])
+nico = Niconico.new(mail: config["email"], password: config["password"],
+                    token: File.exist?(SESSION_FILE) ? File.read(SESSION_FILE).chomp : nil)
+
+nico.login
+open(SESSION_FILE, 'w', 0600) do |io|
+  io.puts nico.token
+end
 
 nico.channel_videos(ch).each do |video|
   id = video.id
